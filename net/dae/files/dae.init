@@ -1,5 +1,6 @@
 #!/bin/sh /etc/rc.common
 # Copyright (C) 2023 Tianling Shen <cnsztl@immortalwrt.org>
+# Modified for service stop to clean up netns
 
 USE_PROCD=1
 START=99
@@ -8,9 +9,12 @@ extra_command "hot_reload" "Hot-reload service"
 
 CONF="dae"
 PROG="/usr/bin/dae"
+PIDFILE="/var/run/dae.pid"
 LOG_DIR="/var/log/dae"
+NETNS="/var/run/netns/daens"
 
 start_service() {
+	logger -t dae "Starting dae..."
 	config_load "$CONF"
 
 	local enabled
@@ -44,13 +48,30 @@ start_service() {
 }
 
 stop_service() {
-	rm -rf "$LOG_DIR"
+	logger -t dae "Stopping dae..."
+}
+
+service_stopped() {
+	logger -t dae "Service dae is fully stopped. Cleaning netns..."
+        # clean netns
+        if [ -e "$NETNS" ]; then
+                busybox umount "$NETNS" 2>/dev/null
+                rm -f "$NETNS"
+                logger -t dae "Cleaned netns: $NETNS"
+        fi           
+        rm -rf "$LOG_DIR"   
 }
 
 service_triggers() {
 	procd_add_reload_trigger "$CONF"
 }
 
+reload_service() {
+	logger -t dae "Reloading dae..."
+	[ -f "$PIDFILE" ] && "$PROG" reload "$(cat $PIDFILE)"
+}
+
 hot_reload() {
-	"$PROG" reload "$(cat /var/run/dae.pid)"
+	## /etc/init.d/dae running && "$PROG" reload "$(cat /var/run/dae.pid)"
+	reload_service
 }
