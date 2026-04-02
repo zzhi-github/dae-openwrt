@@ -55,10 +55,9 @@ jobs:
 
       - name: Get latest dae RC version
         run: |
-          git clone --tags --depth=1 https://github.com/daeuniverse/dae
-          cd dae
-
-          RC_TAG=$(git tag | grep -E '[0-9]+rc[0-9]+' | sort -V | tail -n1)
+          RC_TAG=$(curl -s 'https://api.github.com/repos/daeuniverse/dae/releases' \
+            | jq -r '[.[] | select(.prerelease == true and (.tag_name | test("rc")))][0].tag_name' \
+            | tr -d 'v')
 
           echo "TAG=$RC_TAG" >> $GITHUB_ENV
 
