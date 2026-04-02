@@ -53,14 +53,14 @@ jobs:
         run: |
           go version
 
-      - name: Get latest dae version
+      - name: Get latest dae RC version
         run: |
           git clone --tags --depth=1 https://github.com/daeuniverse/dae
           cd dae
 
           RC_TAG=$(git tag | grep -E '[0-9]+rc[0-9]+' | sort -V | tail -n1)
 
-          echo "RC_TAG=$RC_TAG" >> $GITHUB_ENV
+          echo "TAG=$RC_TAG" >> $GITHUB_ENV
 
       - name: Build
         run: |
