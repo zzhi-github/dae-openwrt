@@ -1,4 +1,4 @@
-name: Build dae release.apk
+name: Build dae rc release.apk
 
 on:
   workflow_dispatch:
