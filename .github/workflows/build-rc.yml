@@ -74,7 +74,7 @@ jobs:
           wget https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/config.buildinfo -O .config
           make defconfig
           cp -a ../net package/
-          sed -i 's/PKG_VERSION:=stable/PKG_VERSION:=${{ env.TAG }}/g' package/net/dae/Makefile
+          sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=${{ env.TAG }}/g' package/net/dae/Makefile
           cat package/net/dae/Makefile
           make package/net/dae/{download,check} FIXUP=1 V=s
           cat package/net/dae/Makefile
