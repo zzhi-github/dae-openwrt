@@ -73,6 +73,7 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
+          cat ../configs/kernel/*.config >> .config
           make defconfig
           cp -a ../net package/
 
