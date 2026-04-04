@@ -97,7 +97,7 @@ jobs:
         with:
           name: ${{ env.PKG_NAME }}
           path: |
-            sdk/bin/packages/*/*/dae*.apk
+            sdk/bin/packages/*/*/dae*.ipk
 
       - name: Read release.md and use it as a body of new release
         id: read_release
@@ -114,7 +114,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: sdk/bin/packages/*/*/dae*.apk
+          file: sdk/bin/packages/*/*/dae*.ipk
           tag: latest
           file_glob: true
           overwrite: true
