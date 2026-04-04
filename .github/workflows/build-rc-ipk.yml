@@ -86,7 +86,9 @@ jobs:
           cat ../kernel_config/configs/kernel/*.config >> .config
           make defconfig
           cp -a ../net package/
-          tree ./package
+          cat "$$$$"
+          cat .config
+          cat "$$$$"
 
           # Convert TAG to OpenWrt-friendly format
           TAG_UNDERSCORE=$(echo "${{ env.TAG }}" | sed 's/rc/_rc/')
