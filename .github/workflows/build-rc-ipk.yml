@@ -106,7 +106,7 @@ jobs:
           # cat package/net/dae/Makefile
           # make package/net/dae/compile V=s
 
-          FN=$(find sdk/bin/targets -name 'dae*.ipk' | sort | head -1 | xargs basename)
+          FN=$(find bin/packages -name 'dae*.ipk' | sort | head -1 | xargs basename)
           echo "PKG_NAME=$FN" >> $GITHUB_ENV
 
           cd -
