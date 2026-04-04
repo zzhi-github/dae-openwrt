@@ -62,7 +62,7 @@ jobs:
 
           echo "TAG=$RC_TAG" >> $GITHUB_ENV
           
-      - name：Get dae kernel config
+      - name: Get dae kernel config
         run: |
           git clone --depth=1 https://github.com/douglarek/build-openwrt.git kernel_config
           tree ./kernel_config
