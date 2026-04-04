@@ -70,10 +70,13 @@ jobs:
           mkdir sdk
           tar -I zstd -xf sdk.tar.xz --strip-components=1 -C sdk
           cd sdk
+
+          git clone --depth=1 https://github.com/douglarek/build-openwrt.git kernel_config
+          cat kernel_config/configs/feeds.conf >> feeds.conf.default
+          
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
-          git clone --depth=1 https://github.com/douglarek/build-openwrt.git kernel_config
           cat kernel_config/configs/kernel/*.config >> .config
           make defconfig
           cp -a ../net package/
