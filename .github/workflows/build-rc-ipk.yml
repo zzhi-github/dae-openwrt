@@ -87,7 +87,8 @@ jobs:
           sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TAG_UNDERSCORE/" package/net/dae/Makefile
           
           cat package/net/dae/Makefile
-          make package/net/dae/{download,check} FIXUP=1 V=s
+          make package/net/dae/download FIXUP=1 V=s
+          make package/net/dae/check FIXUP=1 V=s
           cat package/net/dae/Makefile
           make package/net/dae/compile V=s
 
