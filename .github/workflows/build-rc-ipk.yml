@@ -77,9 +77,8 @@ jobs:
           ##tar -I zstd -xf sdk.tar.xz --strip-components=1 -C sdk
           ##cd sdk
           ##cat feeds.conf.default
-          git clone --depth=1 https://github.com/openwrt/openwrt.git sdk
+          git clone --depth=1 --branch v24.10.4 https://github.com/openwrt/openwrt.git sdk
           cd sdk
-          git checkout v24.10.4
           cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
           
           ./scripts/feeds update -a
