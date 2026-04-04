@@ -84,6 +84,7 @@ jobs:
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
           cat ../kernel_config/configs/kernel/*.config >> .config
+          echo "CONFIG_PACKAGE_dae=y" >> .config
           make defconfig
           cp -a ../net package/
 
