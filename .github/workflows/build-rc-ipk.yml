@@ -94,6 +94,8 @@ jobs:
           
           make defconfig
 
+          cat /home/runner/work/dae-openwrt/dae-openwrt/sdk/scripts/config
+
           tree ./package/net/dae
 
           # Convert TAG to OpenWrt-friendly format
