@@ -93,7 +93,7 @@ jobs:
           
           make defconfig
 
-          ##cp -a ../net package/
+          cp -a ../net package/
           tree ./package/net/dae
 
           # Convert TAG to OpenWrt-friendly format
