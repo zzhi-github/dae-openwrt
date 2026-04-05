@@ -83,6 +83,8 @@ jobs:
           
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          rm -f package/net/dae/git.Makefile
+          ./scripts/feeds install /package/net/dae
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
           cat ../kernel_config/configs/kernel/*.config >> .config          
@@ -91,7 +93,7 @@ jobs:
           
           make defconfig
 
-          cp -a ../net package/
+          ##cp -a ../net package/
           tree ./package/net/dae
 
           # Convert TAG to OpenWrt-friendly format
