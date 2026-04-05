@@ -66,6 +66,7 @@ jobs:
         run: |
           git clone --depth=1 https://github.com/douglarek/build-openwrt.git kernel_config
           tree ./kernel_config
+          git clone --depth=1 
           
       - name: Build
         run: |
@@ -79,12 +80,13 @@ jobs:
           ##cat feeds.conf.default
           ##git clone --depth=1 --branch v24.10.4 https://github.com/openwrt/openwrt.git sdk
           ##cd sdk
-          cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
+          ## cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
+          cp -r ./net package/
           
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          cp -a ../net package/     
-          rm -f package/net/dae/git.Makefile
+          ## cp -a ../net package/     
+          ## rm -f package/net/dae/git.Makefile
           tree package/net
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
@@ -104,10 +106,10 @@ jobs:
 
           ## make -j$(nproc) download world V=s
           ## make -j$(nproc) world V=s
-          make package/net/dae/download FIXUP=1 V=s
-          make package/net/dae/check FIXUP=1 V=s
+          make package/dae/download FIXUP=1 V=s
+          make package/dae/check FIXUP=1 V=s
           cat package/net/dae/Makefile
-          make package/net/dae/compile V=s
+          make package/dae/compile V=s
 
           FN=$(find bin/packages -name 'dae*.ipk' | sort | head -1 | xargs basename)
           echo "PKG_NAME=$FN" >> $GITHUB_ENV
