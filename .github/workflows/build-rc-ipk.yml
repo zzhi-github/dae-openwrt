@@ -108,8 +108,6 @@ jobs:
           make package/dae/download FIXUP=1 V=s
           make package/dae/check FIXUP=1 V=s
           cat package/net/dae/Makefile
-
-          ls -l /home/runner/work/dae-openwrt/dae-openwrt/sdk/build_dir/target-aarch64_generic_musl/dae-1.1.0_rc1
           
           make package/dae/compile V=s
 
