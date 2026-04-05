@@ -84,9 +84,8 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           cp -a ../net package/     
-          rm -f package/net/dae/git.Makefile
           tree package/net
-          ./scripts/feeds install /package/net/dae
+          ./scripts/feeds install -a
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
           cat ../kernel_config/configs/kernel/*.config >> .config          
