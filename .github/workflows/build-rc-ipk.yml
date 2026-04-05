@@ -83,7 +83,7 @@ jobs:
           cp -r ../net package/
           
           ./scripts/feeds update -a
-          ./scripts/feeds install -a
+          ## ./scripts/feeds install -a
           ## cp -a ../net package/     
           ## rm -f package/net/dae/git.Makefile
           tree package/net
