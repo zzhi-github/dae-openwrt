@@ -80,7 +80,7 @@ jobs:
           ##git clone --depth=1 --branch v24.10.4 https://github.com/openwrt/openwrt.git sdk
           ##cd sdk
           ## cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
-          cp -r ./net package/
+          cp -r ../net package/
           
           ./scripts/feeds update -a
           ./scripts/feeds install -a
