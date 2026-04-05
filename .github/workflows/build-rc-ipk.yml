@@ -85,6 +85,7 @@ jobs:
           ./scripts/feeds install -a
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
+          cat ../kernel_config/configs/kernel/*.config >> .config          
           sed -i 's/^\(CONFIG_PACKAGE_dae[-a-z]*\)=m/\1=y/' .config
           cat .config
           
