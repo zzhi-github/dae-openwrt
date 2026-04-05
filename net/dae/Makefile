@@ -86,6 +86,14 @@ DAE_CFLAGS:= \
 	-I$(BPF_HEADERS_DIR)/tools/lib \
 	-I$(BPF_HEADERS_DIR)/arch/$(BPF_KARCH)/include/asm/mach-generic
 
+define Build/Prepare
+	# only unzip if the build dir does not already exist
+	if [ ! -d "$(PKG_BUILD_DIR)" ] || [ -z "$$(ls -A $(PKG_BUILD_DIR))" ]; then \
+		mkdir -p $(PKG_BUILD_DIR); \
+		$(UNZIP_CMD); \
+	fi
+endef
+
 define Build/Compile
 	( \
 		export \
