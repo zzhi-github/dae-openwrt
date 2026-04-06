@@ -120,35 +120,28 @@ endef
 define Build/Compile
 	cd $(PKG_BUILD_DIR) && \
 	\
-	# Set Go environment (CGO enabled for eBPF)
 	export GOOS=linux && \
 	export GOARCH=$(GO_ARCH) && \
 	export CGO_ENABLED=1 && \
 	export GO111MODULE=on && \
 	\
-	# Use TARGET_CC from OpenWRT, fallback to standard names
 	$(if $(TARGET_CC),export CC=$(TARGET_CC);) \
 	$(if $(TARGET_CXX),export CXX=$(TARGET_CXX);) \
 	\
-	# Set BPF compilation environment
 	export BPF_CLANG="$(CLANG)" && \
 	export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" && \
 	export BPF_CFLAGS="$(DAE_CFLAGS)" && \
 	export BPF_TARGET="bpfel,bpfeb" && \
 	export BPF_TRACE_TARGET="$(GO_ARCH)" && \
 	\
-	# Initialize go module if not exists
 	( [ -f go.mod ] || go mod init dae ) && \
 	go mod tidy -compat=1.21 && \
 	\
-	# Download dependencies
 	go mod download && \
 	\
-	# Run go generate (required for eBPF)
 	echo ">>> Running go generate..." && \
 	go generate ./... && \
 	\
-	# Build binary with eBPF support
 	echo ">>> Go build start for $(GO_ARCH) with CGO enabled..." && \
 	go build -v -trimpath \
 		-ldflags="$(GO_PKG_LDFLAGS_X) -s -w" \
@@ -160,7 +153,6 @@ define Build/Compile
 endef
 
 define Package/dae/install
-	## $(call GoPackage/Package/Install/Bin,$(1))
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dae $(1)/usr/bin/
 
