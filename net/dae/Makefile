@@ -31,29 +31,6 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/bpf.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
 
-# Architecture mapping - Must be defined before Build/Compile
-ifeq ($(ARCH),aarch64)
-  GO_ARCH:=arm64
-else ifeq ($(ARCH),x86_64)
-  GO_ARCH:=amd64
-else ifeq ($(ARCH),arm)
-  GO_ARCH:=arm
-else ifeq ($(ARCH),mips64el)
-  GO_ARCH:=mips64le
-else ifeq ($(ARCH),mips64)
-  GO_ARCH:=mips64
-else ifeq ($(ARCH),mipsel)
-  GO_ARCH:=mipsle
-else ifeq ($(ARCH),mips)
-  GO_ARCH:=mips
-else ifeq ($(ARCH),i386)
-  GO_ARCH:=386
-else ifeq ($(ARCH),riscv64)
-  GO_ARCH:=riscv64
-else
-  GO_ARCH:=$(ARCH)
-endif
-
 UNZIP_CMD:=unzip -q -d $(PKG_BUILD_DIR) $(DL_DIR)/$(PKG_SOURCE)
 
 define Package/dae/Default
@@ -121,37 +98,30 @@ define Build/Compile
 	cd $(PKG_BUILD_DIR) && \
 	\
 	echo ">>> Step 1: Generating code..." && \
-	export GOOS=linux && \
-	export CGO_ENABLED=1 && \
-	export GO111MODULE=on && \
-	$(if $(TARGET_CC),export CC=$(TARGET_CC);) \
-	$(if $(TARGET_CXX),export CXX=$(TARGET_CXX);) \
-	( [ -f go.mod ] || go mod init dae ) && \
-	go mod tidy -compat=1.21 && \
 	go generate $(PKG_BUILD_DIR)/control/control.go && \
 	go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go && \
 	go generate $(PKG_BUILD_DIR)/trace/trace.go && \
 	\
-	echo ">>> Step 2: Building dae for target $(GO_ARCH)..." && \
-	export GOOS=linux && \
-	export GOARCH=$(GO_ARCH) && \
-	export CGO_ENABLED=1 && \
-	export GO111MODULE=on && \
-	\
-	$(if $(TARGET_CC),export CC=$(TARGET_CC);) \
-	$(if $(TARGET_CXX),export CXX=$(TARGET_CXX);) \
-	\
-	export BPF_CLANG="$(CLANG)" && \
-	export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" && \
-	export BPF_CFLAGS="$(DAE_CFLAGS)" && \
-	export BPF_TARGET="bpfel,bpfeb" && \
-	export BPF_TRACE_TARGET="$(GO_ARCH)" && \
-	echo ">>> Go build start for $(GO_ARCH) with CGO enabled..." && \
-	go build -v -trimpath \
-		-ldflags="$(GO_PKG_LDFLAGS_X) -s -w" \
-		-tags "$(GO_PKG_TAGS)" \
-		-o $(PKG_BUILD_DIR)/dae \
-		. && \
+	( \
+		echo ">>> Step 2: Building dae for target arm64..." && \
+		export GOOS=linux && \
+		export GOARCH=arm64 && \
+		export CGO_ENABLED=1 && \
+		export GO111MODULE=on && \
+		export CC=aarch64-openwrt-linux-musl-gcc && \
+		export CXX=aarch64-openwrt-linux-musl-g++ && \
+		export BPF_CLANG="$(CLANG)" && \
+		export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" && \
+		export BPF_CFLAGS="$(DAE_CFLAGS)" && \
+		export BPF_TARGET="bpfel,bpfeb" && \
+		export BPF_TRACE_TARGET="arm64" && \
+		echo ">>> Go build start for arm64 with CGO enabled..." && \
+		go build -v -trimpath \
+			-ldflags="$(GO_PKG_LDFLAGS_X) -s -w" \
+			-tags "$(GO_PKG_TAGS)" \
+			-o $(PKG_BUILD_DIR)/dae \
+			. \
+	) && \
 	echo ">>> Build completed successfully"
 endef
 
