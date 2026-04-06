@@ -139,7 +139,7 @@ define Package/dae-geosite/install
 	$(LN) ../v2ray/geosite.dat $(1)/usr/share/dae/geosite.dat
 endef
 
-$(eval $(call GoBinPackage,dae))
+## $(eval $(call GoBinPackage,dae))
 $(eval $(call BuildPackage,dae))
 $(eval $(call BuildPackage,dae-geoip))
 $(eval $(call BuildPackage,dae-geosite))
