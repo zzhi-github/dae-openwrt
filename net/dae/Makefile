@@ -120,6 +120,17 @@ endef
 define Build/Compile
 	cd $(PKG_BUILD_DIR) && \
 	\
+	echo ">>> Step 1: Generating code..." && \
+	export GOOS=linux && \
+	export CGO_ENABLED=0 && \
+	export GO111MODULE=on && \
+	( [ -f go.mod ] || go mod init dae ) && \
+	go mod tidy -compat=1.21 && \
+	go generate $(PKG_BUILD_DIR)/control/control.go && \
+	go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go && \
+	go generate $(PKG_BUILD_DIR)/trace/trace.go && \
+	\
+	echo ">>> Step 2: Building dae for target $(GO_ARCH)..." && \
 	export GOOS=linux && \
 	export GOARCH=$(GO_ARCH) && \
 	export CGO_ENABLED=1 && \
@@ -133,22 +144,12 @@ define Build/Compile
 	export BPF_CFLAGS="$(DAE_CFLAGS)" && \
 	export BPF_TARGET="bpfel,bpfeb" && \
 	export BPF_TRACE_TARGET="$(GO_ARCH)" && \
-	\
-	( [ -f go.mod ] || go mod init dae ) && \
-	go mod tidy -compat=1.21 && \
-	\
-	go mod download && \
-	\
-	echo ">>> Running go generate..." && \
-	go generate ./... && \
-	\
 	echo ">>> Go build start for $(GO_ARCH) with CGO enabled..." && \
 	go build -v -trimpath \
 		-ldflags="$(GO_PKG_LDFLAGS_X) -s -w" \
 		-tags "$(GO_PKG_TAGS)" \
 		-o $(PKG_BUILD_DIR)/dae \
 		. && \
-	\
 	echo ">>> Build completed successfully"
 endef
 
