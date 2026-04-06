@@ -96,6 +96,7 @@ endef
 
 define Build/Compile
 	( \
+		cd $(PKG_BUILD_DIR) ; \
 		export \
 		$(GO_GENERAL_BUILD_CONFIG_VARS) \
 		$(GO_PKG_BUILD_CONFIG_VARS) \
@@ -105,10 +106,17 @@ define Build/Compile
 		BPF_CFLAGS="$(DAE_CFLAGS)" \
 		BPF_TARGET="bpfel,bpfeb" \
 		BPF_TRACE_TARGET="$(GO_ARCH)" ; \
-		go generate $(PKG_BUILD_DIR)/control/control.go ; \
-		go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
-		go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
-		$(call GoPackage/Build/Compile) ; \
+        GOFLAGS="-buildvcs=false" ; \
+		## go generate $(PKG_BUILD_DIR)/control/control.go ; \
+		## go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
+		## go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
+		go generate ./... ; \
+		##$(call GoPackage/Build/Compile) ; \
+        go build -v -trimpath \
+            -ldflags "$$(go env GOLDFLAGS)" \
+            -tags "$(GO_PKG_TAGS)" \
+            -o $(PKG_BUILD_DIR)/dae \
+            . ; \
 	)
 endef
 
