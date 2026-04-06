@@ -105,12 +105,11 @@ define Build/Compile
 		BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
 		BPF_CFLAGS="$(DAE_CFLAGS)" \
 		BPF_TARGET="bpfel,bpfeb" \
-		BPF_TRACE_TARGET="$(GO_ARCH)" \
-        GOFLAGS="-buildvcs=false" ; \
-		## go generate $(PKG_BUILD_DIR)/control/control.go ; \
-		## go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
-		## go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
-		go generate ./... ; \
+		BPF_TRACE_TARGET="$(GO_ARCH)" ; \
+		go generate $(PKG_BUILD_DIR)/control/control.go ; \
+		go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
+		go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
+		## go generate ./... ; \
 		##$(call GoPackage/Build/Compile) ; \
         go build -v -trimpath \
             -ldflags "$$(go env GOLDFLAGS)" \
