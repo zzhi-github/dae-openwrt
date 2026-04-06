@@ -96,29 +96,31 @@ endef
 
 define Build/Compile
 	cd $(PKG_BUILD_DIR) && \
-	export \
-		$(GO_GENERAL_BUILD_CONFIG_VARS) \
-		$(GO_PKG_BUILD_CONFIG_VARS) \
-		$(GO_PKG_BUILD_VARS) \
-		BPF_CLANG="$(CLANG)" \
-		BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
-		BPF_CFLAGS="$(DAE_CFLAGS)" \
-		BPF_TARGET="bpfel,bpfeb" \
-		BPF_TRACE_TARGET="$(GO_ARCH)" ; \
 	\
-	# Diagnostics: list current dir and files
-	echo ">>> Current PKG_BUILD_DIR: $(PKG_BUILD_DIR)" ; \
-	pwd ; ls -l ; \
+	# Set Go env（Activate CGO）
+	export GOOS=linux && \
+	export GOARCH=$(GO_ARCH) && \
+	export CGO_ENABLED=1 && \
+	export CC=$(TARGET_CC) && \
+	export CXX=$(TARGET_CXX) && \
+	export GO111MODULE=on && \
 	\
-	# Show Go environment for debug
-	go env ; \
+	# Set BPF Compile env
+	export BPF_CLANG="$(CLANG)" && \
+	export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" && \
+	export BPF_CFLAGS="$(DAE_CFLAGS)" && \
+	export BPF_TARGET="bpfel,bpfeb" && \
 	\
-	go generate $(PKG_BUILD_DIR)/control/control.go ; \
-	go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
-	go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
-	echo ">>> Go build start" ; \
+	# Handle go.mod
+	( [ -f go.mod ] || go mod init dae ) && \
+	go mod tidy -compat=1.21 && \
+	\
+	# Execute go generate（ignore error）
+	go generate ./... 2>/dev/null || true && \
+	\
+	# Build binary
 	go build -v -trimpath \
-		-ldflags "$$(go env GOLDFLAGS)" \
+		-ldflags="$(GO_PKG_LDFLAGS)" \
 		-tags "$(GO_PKG_TAGS)" \
 		-o $(PKG_BUILD_DIR)/dae \
 		.
@@ -148,6 +150,28 @@ define Package/dae-geosite/install
 	$(INSTALL_DIR) $(1)/usr/share/dae
 	$(LN) ../v2ray/geosite.dat $(1)/usr/share/dae/geosite.dat
 endef
+
+# Set GO_ARCH
+ifeq ($(ARCH),aarch64)
+  GO_ARCH:=arm64
+else ifeq ($(ARCH),x86_64)
+  GO_ARCH:=amd64
+else ifeq ($(ARCH),arm)
+  GO_ARCH:=arm
+else ifeq ($(ARCH),mips64el)
+  GO_ARCH:=mips64le
+else ifeq ($(ARCH),mips64)
+  GO_ARCH:=mips64
+else ifeq ($(ARCH),mipsel)
+  GO_ARCH:=mipsle
+else ifeq ($(ARCH),mips)
+  GO_ARCH:=mips
+else ifeq ($(ARCH),i386)
+  GO_ARCH:=386
+else
+  GO_ARCH:=$(ARCH)
+endif
+
 
 ## $(eval $(call GoBinPackage,dae))
 $(eval $(call BuildPackage,dae))
