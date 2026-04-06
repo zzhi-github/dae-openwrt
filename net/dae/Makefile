@@ -31,6 +31,29 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/bpf.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
 
+# Architecture mapping - Must be defined before Build/Compile
+ifeq ($(ARCH),aarch64)
+  GO_ARCH:=arm64
+else ifeq ($(ARCH),x86_64)
+  GO_ARCH:=amd64
+else ifeq ($(ARCH),arm)
+  GO_ARCH:=arm
+else ifeq ($(ARCH),mips64el)
+  GO_ARCH:=mips64le
+else ifeq ($(ARCH),mips64)
+  GO_ARCH:=mips64
+else ifeq ($(ARCH),mipsel)
+  GO_ARCH:=mipsle
+else ifeq ($(ARCH),mips)
+  GO_ARCH:=mips
+else ifeq ($(ARCH),i386)
+  GO_ARCH:=386
+else ifeq ($(ARCH),riscv64)
+  GO_ARCH:=riscv64
+else
+  GO_ARCH:=$(ARCH)
+endif
+
 UNZIP_CMD:=unzip -q -d $(PKG_BUILD_DIR) $(DL_DIR)/$(PKG_SOURCE)
 
 define Package/dae/Default
@@ -97,39 +120,49 @@ endef
 define Build/Compile
 	cd $(PKG_BUILD_DIR) && \
 	\
-	# Set Go env（Activate CGO）
+	# Set Go environment (CGO enabled for eBPF)
 	export GOOS=linux && \
 	export GOARCH=$(GO_ARCH) && \
 	export CGO_ENABLED=1 && \
-	export CC=$(TARGET_CC) && \
-	export CXX=$(TARGET_CXX) && \
 	export GO111MODULE=on && \
 	\
-	# Set BPF Compile env
+	# Use TARGET_CC from OpenWRT, fallback to standard names
+	$(if $(TARGET_CC),export CC=$(TARGET_CC);) \
+	$(if $(TARGET_CXX),export CXX=$(TARGET_CXX);) \
+	\
+	# Set BPF compilation environment
 	export BPF_CLANG="$(CLANG)" && \
 	export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" && \
 	export BPF_CFLAGS="$(DAE_CFLAGS)" && \
 	export BPF_TARGET="bpfel,bpfeb" && \
+	export BPF_TRACE_TARGET="$(GO_ARCH)" && \
 	\
-	# Handle go.mod
+	# Initialize go module if not exists
 	( [ -f go.mod ] || go mod init dae ) && \
 	go mod tidy -compat=1.21 && \
 	\
-	# Execute go generate（ignore error）
-	go generate ./... 2>/dev/null || true && \
+	# Download dependencies
+	go mod download && \
 	\
-	# Build binary
+	# Run go generate (required for eBPF)
+	echo ">>> Running go generate..." && \
+	go generate ./... && \
+	\
+	# Build binary with eBPF support
+	echo ">>> Go build start for $(GO_ARCH) with CGO enabled..." && \
 	go build -v -trimpath \
-		-ldflags="$(GO_PKG_LDFLAGS)" \
+		-ldflags="$(GO_PKG_LDFLAGS_X) -s -w" \
 		-tags "$(GO_PKG_TAGS)" \
 		-o $(PKG_BUILD_DIR)/dae \
-		.
-	## $(call GoPackage/Build/Compile) ;
-
+		. && \
+	\
+	echo ">>> Build completed successfully"
 endef
 
 define Package/dae/install
-	$(call GoPackage/Package/Install/Bin,$(1))
+	## $(call GoPackage/Package/Install/Bin,$(1))
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dae $(1)/usr/bin/
 
 	$(INSTALL_DIR) $(1)/etc/dae/
 	$(INSTALL_CONF) $(PKG_BUILD_DIR)/example.dae $(1)/etc/dae/
@@ -150,28 +183,6 @@ define Package/dae-geosite/install
 	$(INSTALL_DIR) $(1)/usr/share/dae
 	$(LN) ../v2ray/geosite.dat $(1)/usr/share/dae/geosite.dat
 endef
-
-# Set GO_ARCH
-ifeq ($(ARCH),aarch64)
-  GO_ARCH:=arm64
-else ifeq ($(ARCH),x86_64)
-  GO_ARCH:=amd64
-else ifeq ($(ARCH),arm)
-  GO_ARCH:=arm
-else ifeq ($(ARCH),mips64el)
-  GO_ARCH:=mips64le
-else ifeq ($(ARCH),mips64)
-  GO_ARCH:=mips64
-else ifeq ($(ARCH),mipsel)
-  GO_ARCH:=mipsle
-else ifeq ($(ARCH),mips)
-  GO_ARCH:=mips
-else ifeq ($(ARCH),i386)
-  GO_ARCH:=386
-else
-  GO_ARCH:=$(ARCH)
-endif
-
 
 ## $(eval $(call GoBinPackage,dae))
 $(eval $(call BuildPackage,dae))
