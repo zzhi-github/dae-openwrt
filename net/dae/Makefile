@@ -96,9 +96,9 @@ endef
 
 define Build/Compile
 	( \
-		export $(GO_GENERAL_BUILD_CONFIG_VARS) \
-		export $(GO_PKG_BUILD_CONFIG_VARS) \
-		export $(GO_PKG_BUILD_VARS) \
+		## export $(GO_GENERAL_BUILD_CONFIG_VARS) \
+		## export $(GO_PKG_BUILD_CONFIG_VARS) \
+		## export $(GO_PKG_BUILD_VARS) \
 		export BPF_CLANG="$(CLANG)" \
 		export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
 		export BPF_CFLAGS="$(DAE_CFLAGS)" \
