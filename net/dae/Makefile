@@ -116,8 +116,8 @@ define Build/Compile
     go generate $(PKG_BUILD_DIR)/control/control.go ; \
     go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
 	go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
-	##$(call GoPackage/Build/Compile) ;
-	echo ">>> Go build start" ; \
+	## $(call GoPackage/Build/Compile) ;
+	# echo ">>> Go build start" ; \
 	go build -v -trimpath \
     	-ldflags "$$(go env GOLDFLAGS)" \
     	-tags "$(GO_PKG_TAGS)" \
