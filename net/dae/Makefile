@@ -96,33 +96,34 @@ endef
 
 define Build/Compile
 	cd $(PKG_BUILD_DIR) && \
-    export \
-        $(GO_GENERAL_BUILD_CONFIG_VARS) \
-        $(GO_PKG_BUILD_CONFIG_VARS) \
-	    $(GO_PKG_BUILD_VARS) \
-        BPF_CLANG="$(CLANG)" \
-        BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
-        BPF_CFLAGS="$(DAE_CFLAGS)" \
-        BPF_TARGET="bpfel,bpfeb" \
-        BPF_TRACE_TARGET="$(GO_ARCH)" ; \
-    \
-    # Diagnostics: list current dir and files
-    echo ">>> Current PKG_BUILD_DIR: $(PKG_BUILD_DIR)" ; \
-    pwd ; ls -l ; \
-    \
-    # Show Go environment for debug
-    go env ; \
-    \
-    go generate $(PKG_BUILD_DIR)/control/control.go ; \
-    go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
+	export \
+		$(GO_GENERAL_BUILD_CONFIG_VARS) \
+		$(GO_PKG_BUILD_CONFIG_VARS) \
+		$(GO_PKG_BUILD_VARS) \
+		BPF_CLANG="$(CLANG)" \
+		BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
+		BPF_CFLAGS="$(DAE_CFLAGS)" \
+		BPF_TARGET="bpfel,bpfeb" \
+		BPF_TRACE_TARGET="$(GO_ARCH)" ; \
+	\
+	# Diagnostics: list current dir and files
+	echo ">>> Current PKG_BUILD_DIR: $(PKG_BUILD_DIR)" ; \
+	pwd ; ls -l ; \
+	\
+	# Show Go environment for debug
+	go env ; \
+	\
+	go generate $(PKG_BUILD_DIR)/control/control.go ; \
+	go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
 	go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
-	## $(call GoPackage/Build/Compile) ;
 	echo ">>> Go build start" ; \
 	go build -v -trimpath \
-    	-ldflags "$$(go env GOLDFLAGS)" \
-    	-tags "$(GO_PKG_TAGS)" \
-        -o $(PKG_BUILD_DIR)/dae \
-        .
+		-ldflags "$$(go env GOLDFLAGS)" \
+		-tags "$(GO_PKG_TAGS)" \
+		-o $(PKG_BUILD_DIR)/dae \
+		.
+	## $(call GoPackage/Build/Compile) ;
+
 endef
 
 define Package/dae/install
