@@ -105,7 +105,7 @@ define Build/Compile
 		BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
 		BPF_CFLAGS="$(DAE_CFLAGS)" \
 		BPF_TARGET="bpfel,bpfeb" \
-		BPF_TRACE_TARGET="$(GO_ARCH)" ; \
+		BPF_TRACE_TARGET="$(GO_ARCH)" \
 		go generate $(PKG_BUILD_DIR)/control/control.go ; \
 		go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
 		go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
