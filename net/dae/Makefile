@@ -122,8 +122,10 @@ define Build/Compile
 	\
 	echo ">>> Step 1: Generating code..." && \
 	export GOOS=linux && \
-	export CGO_ENABLED=0 && \
+	export CGO_ENABLED=1 && \
 	export GO111MODULE=on && \
+	$(if $(TARGET_CC),export CC=$(TARGET_CC);) \
+	$(if $(TARGET_CXX),export CXX=$(TARGET_CXX);) \
 	( [ -f go.mod ] || go mod init dae ) && \
 	go mod tidy -compat=1.21 && \
 	go generate $(PKG_BUILD_DIR)/control/control.go && \
