@@ -96,21 +96,21 @@ endef
 
 define Build/Compile
 	( \
-		cd $(PKG_BUILD_DIR) ; \
-		export $(GO_GENERAL_BUILD_CONFIG_VARS) ; \
-		export $(GO_PKG_BUILD_CONFIG_VARS) ; \
-		export $(GO_PKG_BUILD_VARS) ; \
-		export BPF_CLANG="$(CLANG)" ; \
-		export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" ; \
-		export BPF_CFLAGS="$(DAE_CFLAGS)" ; \
-		export BPF_TARGET="bpfel,bpfeb" ; \
-		export BPF_TRACE_TARGET="$(GO_ARCH)" ; \
+		export $(GO_GENERAL_BUILD_CONFIG_VARS) \
+		export $(GO_PKG_BUILD_CONFIG_VARS) \
+		export $(GO_PKG_BUILD_VARS) \
+		export BPF_CLANG="$(CLANG)" \
+		export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
+		export BPF_CFLAGS="$(DAE_CFLAGS)" \
+		export BPF_TARGET="bpfel,bpfeb" \
+		export BPF_TRACE_TARGET="$(GO_ARCH)" \
 		go generate $(PKG_BUILD_DIR)/control/control.go ; \
 		go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
 		go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
 		## go generate ./... ; \
 		##$(call GoPackage/Build/Compile) ; \
-        go build -v -trimpath \
+ 		cd $(PKG_BUILD_DIR) ; \
+    	go build -v -trimpath \
             -ldflags "$$(go env GOLDFLAGS)" \
             -tags "$(GO_PKG_TAGS)" \
             -o $(PKG_BUILD_DIR)/dae \
