@@ -23,8 +23,8 @@ PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/daeuniverse/dae
 GO_PKG_LDFLAGS_X:= \
-	$(GO_PKG)/cmd.Version=$(PKG_VERSION) \
-	$(GO_PKG)/common/consts.MaxMatchSetLen_=1024
+        $(GO_PKG)/cmd.Version=$(PKG_VERSION) \
+        $(GO_PKG)/common/consts.MaxMatchSetLen_=1024
 GO_PKG_TAGS:=trace
 
 include $(INCLUDE_DIR)/package.mk
@@ -81,75 +81,53 @@ define Package/dae/conffiles
 endef
 
 DAE_CFLAGS:= \
-	-O2 -Wall -Werror \
-	-DMAX_MATCH_SET_LEN=1024 \
-	-I$(BPF_HEADERS_DIR)/tools/lib \
-	-I$(BPF_HEADERS_DIR)/arch/$(BPF_KARCH)/include/asm/mach-generic
-
-define Build/Prepare
-	# only unzip if the build dir does not already exist
-	if [ ! -d "$(PKG_BUILD_DIR)" ] || [ -z "$$(ls -A $(PKG_BUILD_DIR))" ]; then \
-		mkdir -p $(PKG_BUILD_DIR); \
-		$(UNZIP_CMD); \
-	fi
-endef
+        -O2 -Wall -Werror \
+        -DMAX_MATCH_SET_LEN=1024 \
+        -I$(BPF_HEADERS_DIR)/tools/lib \
+        -I$(BPF_HEADERS_DIR)/arch/$(BPF_KARCH)/include/asm/mach-generic
 
 define Build/Compile
-	cd $(PKG_BUILD_DIR) && \
-	\
-	echo ">>> Step 1: Generating code..." && \
-	go generate $(PKG_BUILD_DIR)/control/control.go && \
-	go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go && \
-	go generate $(PKG_BUILD_DIR)/trace/trace.go && \
-	\
-	( \
-		echo ">>> Step 2: Building dae for target arm64..." && \
-		export GOOS=linux && \
-		export GOARCH=arm64 && \
-		export CGO_ENABLED=1 && \
-		export GO111MODULE=on && \
-		export CC=aarch64-openwrt-linux-musl-gcc && \
-		export CXX=aarch64-openwrt-linux-musl-g++ && \
-		export BPF_CLANG="$(CLANG)" && \
-		export BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" && \
-		export BPF_CFLAGS="$(DAE_CFLAGS)" && \
-		export BPF_TARGET="bpfel,bpfeb" && \
-		export BPF_TRACE_TARGET="arm64" && \
-		echo ">>> Go build start for arm64 with CGO enabled..." && \
-		go build -v -trimpath \
-			-ldflags="$(GO_PKG_LDFLAGS_X) -s -w" \
-			-tags "$(GO_PKG_TAGS)" \
-			-o $(PKG_BUILD_DIR)/dae \
-			. \
-	) && \
-	echo ">>> Build completed successfully"
+        ( \
+                export \
+                $(GO_GENERAL_BUILD_CONFIG_VARS) \
+                $(GO_PKG_BUILD_CONFIG_VARS) \
+                $(GO_PKG_BUILD_VARS) \
+                BPF_CLANG="$(CLANG)" \
+                BPF_STRIP_FLAG="-strip=$(LLVM_STRIP)" \
+                BPF_CFLAGS="$(DAE_CFLAGS)" \
+                BPF_TARGET="bpfel,bpfeb" \
+                BPF_TRACE_TARGET="$(GO_ARCH)" ; \
+                go generate $(PKG_BUILD_DIR)/control/control.go ; \
+                go generate $(PKG_BUILD_DIR)/control/kern/tests/bpf_test.go ; \
+                go generate $(PKG_BUILD_DIR)/trace/trace.go ; \
+                $(call GoPackage/Build/Compile) ; \
+        )
 endef
 
 define Package/dae/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dae $(1)/usr/bin/
+        $(call GoPackage/Package/Install/Bin,$(1))
 
-	$(INSTALL_DIR) $(1)/etc/dae/
-	$(INSTALL_CONF) $(PKG_BUILD_DIR)/example.dae $(1)/etc/dae/
+        $(INSTALL_DIR) $(1)/etc/dae/
+        $(INSTALL_CONF) $(PKG_BUILD_DIR)/example.dae $(1)/etc/dae/
 
-	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) $(CURDIR)/files/dae.config $(1)/etc/config/dae
+        $(INSTALL_DIR) $(1)/etc/config
+        $(INSTALL_CONF) $(CURDIR)/files/dae.config $(1)/etc/config/dae
 
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) $(CURDIR)/files/dae.init $(1)/etc/init.d/dae
+        $(INSTALL_DIR) $(1)/etc/init.d
+        $(INSTALL_BIN) $(CURDIR)/files/dae.init $(1)/etc/init.d/dae
 endef
 
 define Package/dae-geoip/install
-	$(INSTALL_DIR) $(1)/usr/share/dae
-	$(LN) ../v2ray/geoip.dat $(1)/usr/share/dae/geoip.dat
+        $(INSTALL_DIR) $(1)/usr/share/dae
+        $(LN) ../v2ray/geoip.dat $(1)/usr/share/dae/geoip.dat
 endef
 
 define Package/dae-geosite/install
-	$(INSTALL_DIR) $(1)/usr/share/dae
-	$(LN) ../v2ray/geosite.dat $(1)/usr/share/dae/geosite.dat
+        $(INSTALL_DIR) $(1)/usr/share/dae
+        $(LN) ../v2ray/geosite.dat $(1)/usr/share/dae/geosite.dat
 endef
 
-## $(eval $(call GoBinPackage,dae))
+$(eval $(call GoBinPackage,dae))
 $(eval $(call BuildPackage,dae))
 $(eval $(call BuildPackage,dae-geoip))
 $(eval $(call BuildPackage,dae-geosite))
