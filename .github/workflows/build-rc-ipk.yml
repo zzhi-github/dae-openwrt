@@ -82,19 +82,19 @@ jobs:
           sed -i '/dahdi/d' .config
           make defconfig
           cat .config
-          
-          tree feeds/custom/dae
+
+          cp -r ../net/dae package/
 
           # Convert TAG to OpenWrt-friendly format
           TAG_UNDERSCORE=$(echo "${{ env.TAG }}" | sed 's/rc/_rc/')
-          sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TAG_UNDERSCORE/" feeds/custom/dae/Makefile
+          sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TAG_UNDERSCORE/" package/dae/Makefile
           
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
           make target/linux/compile
           
           # 2. 编译你的 dae 包
-          make package/feeds/custom/dae/compile V=s
+          make package/dae/compile V=s
 
           FN=$(find ./bin -name 'dae*.ipk' | sort | head -1)
           if [ -z "$FN" ]; then
