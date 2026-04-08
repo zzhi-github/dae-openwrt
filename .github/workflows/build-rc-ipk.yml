@@ -73,12 +73,12 @@ jobs:
           cd openwrt
           git fetch --depth 1 origin tag v24.10.4
           git checkout v24.10.4
-          cat kernel_config/configs/feeds.conf >> feeds.conf.default
+          cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
           cat feeds.conf.default
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
-          cat kernel_config/configs/kernel/*.config >> .config
+          cat ../kernel_config/configs/kernel/*.config >> .config
           sed -i '/dahdi/d' .config
           make defconfig
           cat .config
