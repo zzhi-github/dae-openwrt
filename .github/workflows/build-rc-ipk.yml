@@ -69,23 +69,17 @@ jobs:
           
       - name: Build
         run: |
-          ## SDK=$(curl -s https://api.github.com/repos/douglarek/build-openwrt/releases/latest | grep browser_download_url | cut -d : -f 2,3 | tr -d \" | grep -E 'openwrt-sdk-' | head -1)
-          ## wget $SDK -O sdk.tar.xz
+          SDK=$(curl -s https://api.github.com/repos/douglarek/build-openwrt/releases/latest | grep browser_download_url | cut -d : -f 2,3 | tr -d \" | grep -E 'openwrt-sdk-' | head -1)
+          wget $SDK -O sdk.tar.xz
           
-          wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/openwrt-sdk-24.10.4-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.zst -O sdk.tar.xz
           mkdir sdk
           tar -I zstd -xf sdk.tar.xz --strip-components=1 -C sdk
           cd sdk
           ##cat feeds.conf.default
-          ##git clone --depth=1 --branch v24.10.4 https://github.com/openwrt/openwrt.git sdk
-          ##cd sdk
           ## cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
           cp -r ../net package/
           
           ./scripts/feeds update -a
-          ## ./scripts/feeds install -a
-          ## cp -a ../net package/     
-          ## rm -f package/net/dae/git.Makefile
           tree package/net
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
@@ -102,9 +96,6 @@ jobs:
           sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TAG_UNDERSCORE/" package/net/dae/Makefile
           
           cat package/net/dae/Makefile
-
-          ## make -j$(nproc) download world V=s
-          ## make -j$(nproc) world V=s
           make package/dae/download FIXUP=1 V=s
           make package/dae/check FIXUP=1 V=s
           cat package/net/dae/Makefile
