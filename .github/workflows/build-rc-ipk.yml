@@ -101,7 +101,7 @@ jobs:
 
           FN=$(find ./bin -name 'dae*.ipk' | sort | head -1)
           if [ -z "$FN" ]; then
-            echo "No IPK found!" && exit 1
+            echo "No IPK found!" && exit 2
           fi
           FN=$(basename "$FN")
           echo "PKG_NAME=$FN" >> $GITHUB_ENV
