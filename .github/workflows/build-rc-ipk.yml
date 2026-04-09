@@ -85,6 +85,7 @@ jobs:
 
           ## cp -r ../net/dae package/
           tree feeds/custom/net/dae
+          ls -la feeds/custom || true
 
           # Convert TAG to OpenWrt-friendly format
           TAG_UNDERSCORE=$(echo "${{ env.TAG }}" | sed 's/rc/_rc/')
@@ -97,7 +98,7 @@ jobs:
           # make target/linux/compile
           
           # 2. 编译你的 dae 包
-          make package/feeds/custom/net/dae/compile V=s
+          make package/feeds/custom/dae/compile V=s
 
           FN=$(find ./bin -name 'dae*.ipk' | sort | head -1)
           if [ -z "$FN" ]; then
