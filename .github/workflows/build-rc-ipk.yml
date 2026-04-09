@@ -84,31 +84,8 @@ jobs:
           cat .config
 
           ## cp -r ../net/dae package/
-          set +e  # 临时关闭错误退出，确保所有检查都执行
-          
-          echo "=== Current directory ==="
-          pwd
-          
-          echo "=== Check feeds/custom ==="
-          ls -ld feeds/custom || echo "feeds/custom does NOT exist"
-          ls -l feeds/custom/ || echo "Cannot list feeds/custom"
-          
-          echo "=== Check feeds/custom/net ==="
-          ls -ld feeds/custom/net || echo "feeds/custom/net does NOT exist"
-          ls -l feeds/custom/net/ || echo "Cannot list feeds/custom/net"
-          
-          echo "=== Check feeds/custom/net/dae ==="
-          ls -ld feeds/custom/net/dae || echo "feeds/custom/net/dae does NOT exist"
-          ls -l feeds/custom/net/dae/ || echo "Cannot list feeds/custom/net/dae"
-          
-          echo "=== Try to find dae directory anywhere under feeds ==="
-          find feeds -type d -name "dae" || echo "No dae directory found"
-          
-          set -e  # 恢复错误退出
-
 
           tree feeds/custom/net/dae
-
 
           # Convert TAG to OpenWrt-friendly format
           TAG_UNDERSCORE=$(echo "${{ env.TAG }}" | sed 's/rc/_rc/')
