@@ -92,8 +92,6 @@ jobs:
           sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TAG_UNDERSCORE/" feeds/custom/net/dae/Makefile
 
           cat feeds/custom/net/dae/Makefile
-
-          exit 2
           
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
