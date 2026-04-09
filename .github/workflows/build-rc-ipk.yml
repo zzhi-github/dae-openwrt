@@ -90,6 +90,7 @@ jobs:
           # Convert TAG to OpenWrt-friendly format
           TAG_UNDERSCORE=$(echo "${{ env.TAG }}" | sed 's/rc/_rc/')
           sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TAG_UNDERSCORE/" feeds/custom/net/dae/Makefile
+          sed -i 's/^PKG_HASH:=.*/PKG_HASH:=726a049813a4d5b800c441ea76ff0ce1846596c180fba0e8ec920a129b3b6e0a/' feeds/custom/net/dae/Makefile
 
           cat feeds/custom/net/dae/Makefile
           
