@@ -84,8 +84,12 @@ jobs:
           cat .config
 
           ## cp -r ../net/dae package/
+          set -eux
+          echo "print Makefile folder >>>"
+          pwd
           tree feeds/custom/net/dae
           ls -la feeds/custom || true
+          ls -la package/feeds/custom
 
           # Convert TAG to OpenWrt-friendly format
           TAG_UNDERSCORE=$(echo "${{ env.TAG }}" | sed 's/rc/_rc/')
