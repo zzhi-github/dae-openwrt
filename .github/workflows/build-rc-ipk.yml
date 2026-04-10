@@ -108,7 +108,7 @@ jobs:
           FN=$(basename "$FN")
           echo "PKG_NAME=$FN" >> $GITHUB_ENV
 
-          cp bin/packages/aarch64_generic/custom/dae_*.ipk $GITHUB_WORKSPACE/
+          cp bin/packages/aarch64_generic/custom/dae*.ipk $GITHUB_WORKSPACE/
           ## cd -
           ## find sdk/bin/packages -maxdepth 10
 
@@ -117,7 +117,7 @@ jobs:
         with:
           name: ${{ env.PKG_NAME }}
           path: |
-            dae_*.ipk
+            dae*.ipk
 
       - name: Read release.md and use it as a body of new release
         id: read_release
@@ -134,7 +134,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dae_*.ipk
+          file: dae*.ipk
           tag: ${{ env.TAG }}
           file_glob: true
           overwrite: true
