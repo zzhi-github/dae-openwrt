@@ -101,13 +101,14 @@ jobs:
           # 2. 编译你的 dae 包
           make package/feeds/custom/dae/compile V=s
 
-          FN=$(find ./bin -name 'dae*.ipk' | sort | head -1)
+          FN=$(find ./bin -name 'dae_*.ipk' -a ! -name 'dae-geo*' | sort | head -1)
           if [ -z "$FN" ]; then
             echo "No IPK found!" && exit 2
           fi
           FN=$(basename "$FN")
           echo "PKG_NAME=$FN" >> $GITHUB_ENV
 
+          cp bin/packages/aarch64_generic/custom/dae_*.ipk $GITHUB_WORKSPACE/
           ## cd -
           ## find sdk/bin/packages -maxdepth 10
 
@@ -116,7 +117,7 @@ jobs:
         with:
           name: ${{ env.PKG_NAME }}
           path: |
-            bin/packages/**/dae*.ipk
+            dae_*.ipk
 
       - name: Read release.md and use it as a body of new release
         id: read_release
@@ -133,7 +134,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: bin/packages/**/dae*.ipk
+          file: dae_*.ipk
           tag: ${{ env.TAG }}
           file_glob: true
           overwrite: true
