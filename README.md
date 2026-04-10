@@ -15,3 +15,7 @@
 
 **Note:** For optimal stability, it is recommended to use the stable version. Use the unstable version at your own risk.
 
+## For Old Openwrt 24.10.4
+A special package was created for old openwrt 24.10.4 that still uses ipk
+The ipk files were built for specific version. 
+No guarantee for the ipk packages, take it on you own risk.
