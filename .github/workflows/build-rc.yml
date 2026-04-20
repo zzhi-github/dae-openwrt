@@ -7,8 +7,8 @@ on:
         description: 'Dae version to build, format: 1.0.0_rc2'
         required: false
         default: ''
-  schedule:
-    - cron: '0 */12 * * *'
+  ##schedule:
+  ##  - cron: '0 */12 * * *'
 
 permissions:
   actions: write
