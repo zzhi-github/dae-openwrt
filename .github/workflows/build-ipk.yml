@@ -61,7 +61,27 @@ jobs:
           else
             TAG="${{ github.event.inputs.tag }}"
           fi
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "dae latest version: $TAG"
+          
+          if [ -z "$TAG" ]; then
+            echo "Error: Could not generate TAG."
+            exit 1
+          fi                
+          echo "TAG=$TAG" >> $GITHUB_ENV    
+
+          DGST_URL="https://github.com/daeuniverse/dae/releases/download/v${{ env.TAG }}/dae-full-src.zip.dgst"
+          echo "Fetching digest from: $DGST_URL"
+          
+          # 2. Extract the sha256 string (1st column of the sha256 line)
+          # We use -fSL to fail the script if the URL is 404
+          NEW_HASH=$(curl -fSL $DGST_URL | grep 'sha256' | awk '{print $1}')
+          
+          if [ -z "$NEW_HASH" ]; then
+            echo "Error: Could not extract SHA256 hash."
+            exit 1
+          fi          
+          echo "DAE_PKG_HASH=$NEW_HASH" >> $GITHUB_ENV
+          
           
       - name: Get dae kernel config
         run: |
@@ -84,14 +104,12 @@ jobs:
           make defconfig
           cat .config
 
-          ## cp -r ../net/dae package/
-
           tree feeds/custom/net/dae
 
           # Convert TAG to OpenWrt-friendly format
           sed -i 's/PKG_VERSION:=stable/PKG_VERSION:=${{ env.TAG }}/g' feeds/custom/net/dae/Makefile
-          # sed -i 's/^PKG_HASH:=.*/PKG_HASH:=726a049813a4d5b800c441ea76ff0ce1846596c180fba0e8ec920a129b3b6e0a/' feeds/custom/net/dae/Makefile
-
+          sed -i 's/^PKG_HASH:=.*/PKG_HASH:=${{ env.DAE_PKG_HASH }}/g' feeds/custom/net/dae/Makefile
+          
           cat feeds/custom/net/dae/Makefile
           exit 2
           
