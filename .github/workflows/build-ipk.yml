@@ -89,7 +89,7 @@ jobs:
           tree feeds/custom/net/dae
 
           # Convert TAG to OpenWrt-friendly format
-          sed -i 's/PKG_VERSION:=stable/PKG_VERSION:=${{ env.TAG }}/g' package/net/dae/Makefile
+          sed -i 's/PKG_VERSION:=stable/PKG_VERSION:=${{ env.TAG }}/g' feeds/custom/net/dae/Makefile
           # sed -i 's/^PKG_HASH:=.*/PKG_HASH:=726a049813a4d5b800c441ea76ff0ce1846596c180fba0e8ec920a129b3b6e0a/' feeds/custom/net/dae/Makefile
 
           cat feeds/custom/net/dae/Makefile
