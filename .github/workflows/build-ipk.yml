@@ -1,4 +1,4 @@
-name: Build dae rc release.ipk
+name: Build dae release.ipk
 
 on:
   workflow_dispatch:
