@@ -69,7 +69,7 @@ jobs:
           fi                
           echo "TAG=$TAG" >> $GITHUB_ENV    
 
-          DGST_URL="https://github.com/daeuniverse/dae/releases/download/v${{ env.TAG }}/dae-full-src.zip.dgst"
+          DGST_URL="https://github.com/daeuniverse/dae/releases/download/v$TAG/dae-full-src.zip.dgst"
           echo "Fetching digest from: $DGST_URL"
           
           # 2. Extract the sha256 string (1st column of the sha256 line)
