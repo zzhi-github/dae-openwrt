@@ -92,12 +92,27 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/openwrt/openwrt.git
           cd openwrt
+          ./scripts/feeds update packages
+          cp -r feeds/packages/lang/golang /tmp/golang_backup
+          
           git fetch --depth 1 origin tag v24.10.4
           git checkout v24.10.4
           cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
           cat feeds.conf.default
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+
+          echo "Replacing Golang with backed-up version (Go 1.24+)"
+          rm -rf feeds/packages/lang/golang
+          cp -r /tmp/golang_backup feeds/packages/lang/golang 
+          ./scripts/feeds install -f -p packages golang
+          
+          grep "GO_VERSION:=" feeds/packages/lang/golang/Makefile
+          grep BOOTSTRAP feeds/packages/lang/golang/golang/Makefile
+          grep HASH feeds/packages/lang/golang/golang/Makefile          
+
+          exit 2          
+          
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
           cat ../kernel_config/configs/kernel/*.config >> .config
           sed -i '/dahdi/d' .config
@@ -110,17 +125,6 @@ jobs:
           sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=${{ env.TAG }}/g' feeds/custom/net/dae/Makefile
           sed -i 's/^PKG_HASH:=.*/PKG_HASH:=${{ env.DAE_PKG_HASH }}/g' feeds/custom/net/dae/Makefile
           cat feeds/custom/net/dae/Makefile
-          
-          echo "Try to update the go version >= 1.24 in top Makefile"
-          MAKEFILE="feeds/packages/lang/golang/golang/Makefile"          
-          sed -i 's/GO_VERSION_MAJOR_MINOR:=1.23/GO_VERSION_MAJOR_MINOR:=1.24/' $MAKEFILE
-          sed -i 's/GO_VERSION_PATCH:=.*/GO_VERSION_PATCH:=13/' $MAKEFILE
-          sed -i 's/PKG_HASH:=.*/PKG_HASH:=639a6204c2486b137df1eb6e78ee3ed038f9877d0e4b5a465e796a2153f858d7/' $MAKEFILE
-          
-          grep BOOTSTRAP feeds/packages/lang/golang/golang/Makefile
-          grep HASH feeds/packages/lang/golang/golang/Makefile
-
-          exit 2
           
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
