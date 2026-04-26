@@ -104,7 +104,7 @@ jobs:
 
           echo "Replacing Golang with backed-up version (Go 1.24+)"
           rm -rf feeds/packages/lang/golang
-          cp -r /tmp/golang_backup feeds/packages/lang/golang 
+          cp -r /tmp/golang_backup feeds/packages/lang/ 
           ./scripts/feeds install -f -p packages golang
           
           grep "GO_VERSION:=" feeds/packages/lang/golang/Makefile
