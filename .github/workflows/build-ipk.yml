@@ -119,7 +119,6 @@ jobs:
           
           grep GO_VERSION feeds/packages/lang/golang/golang/Makefile
           grep PKG_HASH feeds/packages/lang/golang/golang/Makefile
-          exit 2
           
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
