@@ -109,7 +109,7 @@ jobs:
           cp -r /tmp/golang_backup/. feeds/packages/lang/golang/
           ./scripts/feeds install -f -p packages golang
           
-          grep "GO_VERSION:=" feeds/packages/lang/golang/Makefile
+          grep "GO_VERSION:=" feeds/packages/lang/golang/golang/Makefile
           grep BOOTSTRAP feeds/packages/lang/golang/golang/Makefile
           grep HASH feeds/packages/lang/golang/golang/Makefile          
 
