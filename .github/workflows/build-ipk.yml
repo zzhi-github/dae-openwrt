@@ -117,8 +117,10 @@ jobs:
           sed -i 's/GO_VERSION_PATCH:=.*/GO_VERSION_PATCH:=13/' $MAKEFILE
           sed -i 's/PKG_HASH:=.*/PKG_HASH:=639a6204c2486b137df1eb6e78ee3ed038f9877d0e4b5a465e796a2153f858d7/' $MAKEFILE
           
-          grep GO_VERSION feeds/packages/lang/golang/golang/Makefile
-          grep PKG_HASH feeds/packages/lang/golang/golang/Makefile
+          grep BOOTSTRAP feeds/packages/lang/golang/golang/Makefile
+          grep HASH feeds/packages/lang/golang/golang/Makefile
+
+          exit 2
           
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
