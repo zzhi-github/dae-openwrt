@@ -111,7 +111,12 @@ jobs:
           sed -i 's/^PKG_HASH:=.*/PKG_HASH:=${{ env.DAE_PKG_HASH }}/g' feeds/custom/net/dae/Makefile
           cat feeds/custom/net/dae/Makefile
           
-          echo "Try to update the go version in top Makefil"
+          echo "Try to update the go version >= 1.24 in top Makefile"
+          MAKEFILE="feeds/packages/lang/golang/golang/Makefile"          
+          sed -i 's/GO_VERSION_MAJOR_MINOR:=1.23/GO_VERSION_MAJOR_MINOR:=1.24/' $MAKEFILE
+          sed -i 's/GO_VERSION_PATCH:=.*/GO_VERSION_PATCH:=2/' $MAKEFILE
+          sed -i 's/PKG_HASH:=.*/PKG_HASH:=9dc77ffadc16d837a1bf32d99c624cb4df0647cee7b119edd9e7b1bcc05f2e00/' $MAKEFILE
+          
           grep GO_VERSION feeds/packages/lang/golang/golang/Makefile
           grep HASH feeds/packages/lang/golang/golang/Makefile
           exit 2
