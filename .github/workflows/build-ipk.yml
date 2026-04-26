@@ -107,7 +107,9 @@ jobs:
           rm -rf feeds/packages/lang/golang
           tree /tmp/golang_backup
           cp -r /tmp/golang_backup/. feeds/packages/lang/golang/
-          ./scripts/feeds install -f -p packages golang
+          rm -rf tmp
+          ./scripts/feeds update -i
+          ./scripts/feeds install -a
           
           grep "GO_VERSION:=" feeds/packages/lang/golang/golang/Makefile
           grep BOOTSTRAP feeds/packages/lang/golang/golang/Makefile
