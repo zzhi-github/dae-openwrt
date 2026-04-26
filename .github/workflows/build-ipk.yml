@@ -109,8 +109,12 @@ jobs:
           # Convert TAG to OpenWrt-friendly format
           sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=${{ env.TAG }}/g' feeds/custom/net/dae/Makefile
           sed -i 's/^PKG_HASH:=.*/PKG_HASH:=${{ env.DAE_PKG_HASH }}/g' feeds/custom/net/dae/Makefile
-          
           cat feeds/custom/net/dae/Makefile
+          
+          echo "Try to update the go version in top Makefil"
+          grep GO_VERSION feeds/packages/lang/golang/golang/Makefile
+          grep HASH feeds/packages/lang/golang/golang/Makefile
+          exit 2
           
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
