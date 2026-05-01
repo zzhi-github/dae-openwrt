@@ -100,7 +100,7 @@ jobs:
           cat ../kernel_config/configs/feeds.conf >> feeds.conf.default
           cat feeds.conf.default
           ./scripts/feeds update -a
-          ./scripts/feeds install -a
+          ## ./scripts/feeds install -a
 
           echo "Replacing Golang with backed-up version (Go 1.24+)"
           tree feeds/packages/lang/golang
