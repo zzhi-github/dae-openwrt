@@ -114,8 +114,6 @@ jobs:
           echo "Showing default go version after replacement"
           grep "VERSION:=" feeds/packages/lang/golang/golang/Makefile
           grep "VERSION:=" feeds/packages/lang/golang/golang-values.mk 
-
-          exit 2          
           
           wget https://downloads.openwrt.org/releases/24.10.4/targets/rockchip/armv8/config.buildinfo -O .config
           cat ../kernel_config/configs/kernel/*.config >> .config
