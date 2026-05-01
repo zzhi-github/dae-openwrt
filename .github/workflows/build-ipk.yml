@@ -110,10 +110,10 @@ jobs:
           rm -rf tmp
           ./scripts/feeds update -i
           ./scripts/feeds install -a
-          
-          grep "GO_VERSION:=" feeds/packages/lang/golang/golang/Makefile
-          grep BOOTSTRAP feeds/packages/lang/golang/golang/Makefile
-          grep HASH feeds/packages/lang/golang/golang/Makefile          
+
+          echo "Showing default go version after replacement"
+          grep "VERSION:=" feeds/packages/lang/golang/golang/Makefile
+          grep "VERSION:=" feeds/packages/lang/golang/golang-values.mk 
 
           exit 2          
           
