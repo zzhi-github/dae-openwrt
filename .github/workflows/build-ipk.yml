@@ -131,8 +131,21 @@ jobs:
           # 1. 确保工具链和内核头文件是最新状态
           make toolchain/install
           make target/linux/compile
+
+          # 2. Force build the Go host compiler (the actual binary that compiles dae)
+          make package/feeds/packages/golang/host/compile V=s
+          # --- GO VERSION VALIDATION ---
+          echo "Verifying Go version is 1.24 or newer..."
+          INSTALLED_GO=$(./staging_dir/host/bin/go version | grep -oE 'go1\.[0-9]+' | sed 's/go//')
+          echo "Detected host Go version: $INSTALLED_GO"
           
-          # 2. 编译你的 dae 包
+          # Use awk to compare versions safely
+          awk -v ver="$INSTALLED_GO" 'BEGIN { if (ver < 1.24) exit 1 }' || {
+            echo "ERROR: Go version $INSTALLED_GO is less than 1.24. Build cannot continue."
+            exit 1
+          }
+          
+          # 3. 编译你的 dae 包
           make package/feeds/custom/dae/compile V=s
 
           FN=$(find ./bin -name 'dae_*.ipk' -a ! -name 'dae-geo*' | sort | head -1)
