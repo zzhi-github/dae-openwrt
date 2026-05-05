@@ -137,30 +137,12 @@ jobs:
           make package/feeds/packages/golang/host/compile V=s
     
           # 3. Double check go compiler
-          echo "Searching for Go host binary..."
+          echo "Go compiler binary..."
           # OpenWrt 可能会把 binary 命名为 go, go1.24, 或 go1.26
-          GO_BIN_PATH=$(find staging_dir/hostpkg/bin/ -name "go*" -type f -executable | head -n 1)
-    
-          if [ -z "$GO_BIN_PATH" ]; then
-            echo "ERROR: Go host binary NOT found in staging_dir/hostpkg/bin/"
-            echo "Current directory structure:"
-            ls -R staging_dir/hostpkg/bin/ || true
-            exit 1
-          fi
-    
-          echo "Found Go binary at: $GO_BIN_PATH"
-          
-          # 创建标准软链接以防 Makefile 找不到 'go'
-          ln -sf $(basename "$GO_BIN_PATH") ./staging_dir/hostpkg/bin/go
-          
-          # Verify dae go compiler version (>= 1.24)
-          INSTALLED_GO_VER=$(./staging_dir/hostpkg/bin/go version | grep -oE 'go1\.[0-9]+' | sed 's/go//')
-          echo "Detected Version: $INSTALLED_GO_VER"
-    
-          awk -v ver="$INSTALLED_GO_VER" 'BEGIN { if (ver < 1.24) exit 1 }' || {
-            echo "ERROR: Version $INSTALLED_GO_VER is too old for dae."
-            exit 1
-          }
+          tree ./staging_dir/hostpkg/bin
+          ln -sf ./staging_dir/hostpkg/bin/go1.26 ./staging_dir/hostpkg/bin/go
+          ./staging_dir/hostpkg/bin/go version
+
           
           # 3. Compiling dae ipk
           make package/feeds/custom/dae/compile V=s
