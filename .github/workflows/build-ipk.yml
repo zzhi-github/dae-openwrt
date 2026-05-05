@@ -128,13 +128,15 @@ jobs:
           sed -i 's/^PKG_HASH:=.*/PKG_HASH:=${{ env.DAE_PKG_HASH }}/g' feeds/custom/net/dae/Makefile
           cat feeds/custom/net/dae/Makefile
           
-          # 1. 快速准备基础工具 (Preparation only)
-          make tools/install
+          # Making toolchain
+          echo "Starting full toolchain build..."
+          make toolchain/install
+          make target/linux/compile
           
-          # 2. 直接编译 Go 主机工具 (Host compiler only)
+          # Making Go compiler
           make package/feeds/packages/golang/host/compile V=s
     
-          # 3. 100% 确认路径与版本 (Validation)
+          # 3. Double check go compiler
           echo "Searching for Go host binary..."
           # OpenWrt 可能会把 binary 命名为 go, go1.24, 或 go1.26
           GO_BIN_PATH=$(find staging_dir/hostpkg/bin/ -name "go*" -type f -executable | head -n 1)
@@ -151,7 +153,7 @@ jobs:
           # 创建标准软链接以防 Makefile 找不到 'go'
           ln -sf $(basename "$GO_BIN_PATH") ./staging_dir/hostpkg/bin/go
           
-          # 验证版本是否符合 dae 要求 (>= 1.24)
+          # Verify dae go compiler version (>= 1.24)
           INSTALLED_GO_VER=$(./staging_dir/hostpkg/bin/go version | grep -oE 'go1\.[0-9]+' | sed 's/go//')
           echo "Detected Version: $INSTALLED_GO_VER"
     
@@ -159,13 +161,8 @@ jobs:
             echo "ERROR: Version $INSTALLED_GO_VER is too old for dae."
             exit 1
           }
-    
-          # 4. 只有在上面全部通过后，才开始 2 小时的漫长编译
-          echo "Go 1.24+ confirmed. Starting full toolchain build..."
-          make toolchain/install
-          make target/linux/compile
           
-          # 3. 编译你的 dae 包
+          # 3. Compiling dae ipk
           make package/feeds/custom/dae/compile V=s
 
           FN=$(find ./bin -name 'dae_*.ipk' -a ! -name 'dae-geo*' | sort | head -1)
