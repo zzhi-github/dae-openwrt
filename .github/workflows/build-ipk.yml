@@ -140,7 +140,7 @@ jobs:
           echo "Go compiler binary..."
           # OpenWrt 可能会把 binary 命名为 go, go1.24, 或 go1.26
           tree ./staging_dir/hostpkg/bin
-          ln -sf ./staging_dir/hostpkg/bin/go1.26 ./staging_dir/hostpkg/bin/go
+          ln -sf go1.26 ./staging_dir/hostpkg/bin/go
           ./staging_dir/hostpkg/bin/go version
 
           
